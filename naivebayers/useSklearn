@@ -1,0 +1,52 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+fig=plt.figure()
+
+data1x=np.random.normal(0,1,500)
+data1y=np.random.normal(0,1,500)
+data2x=np.random.normal(1,1,500)
+data2y=np.random.normal(4,1.5,500)
+data3x=np.random.normal(8,2,500)
+data3y=np.random.normal(5,1,500)
+data4x=np.random.normal(3,0.5,500)
+data4y=np.random.normal(3,0.5,500)
+
+ax=fig.add_subplot(111)
+ax.scatter(x=data1x,y=data1y,label='class1',color='w',linewidths=1,s=80, marker='o',edgecolors='dodgerblue')
+ax.scatter(x=data2x,y=data2y,label='class2',color='w',linewidths=1,s=80,marker='^',edgecolors='orangered')
+ax.scatter(x=data3x,y=data3y,label='class3',color='w',linewidths=1,s=80,marker='v',edgecolors='goldenrod')
+ax.scatter(x=data4x,y=data4y,label='class4',color='purple',s=80,marker=(8,2))
+ax.legend(loc='lower right')
+
+plt.show()
+
+X=np.concatenate((np.concatenate((data1x,data2x,data3x,data4x),axis=0).reshape(-1,1),np.concatenate((data1y,data2y,data3y,data4y),axis=0).reshape(-1,1)),axis=1)
+_y=np.zeros(500)
+y=np.concatenate((_y,_y+1,_y+2,_y+3),axis=0)
+
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3)
+clf=GaussianNB()
+clf.fit(X_train,y_train)
+print("在测试集上的正确率为：",clf.score(X_test,y_test))
+print("预测四点标签为：",clf.predict([[1.5,0.7],[2.1,6.1],[6.5,7.3],[3.2,3.3]]))
+print("预测四点各标签概率分布为：\n",clf.predict_proba([[1.5,0.7],[2.1,6.1],[6.5,7.3],[3.2,3.3]]))
+
+from sklearn.metrics import confusion_matrix
+confusion = confusion_matrix(clf.predict(X_test) , y_test)
+print("混淆矩阵：其中横向表示predict，纵向表示真实标签\n",confusion)
+
+# OUTPUT:
+# 在测试集上的正确率为： 0.9583333333333334
+# 预测四点标签为： [0. 1. 2. 3.]
+# 预测四点各标签概率分布为：
+#  [[8.01973484e-01 1.98017770e-01 9.86131832e-07 7.75957432e-06]
+#  [1.46722726e-09 9.75911244e-01 2.40887011e-02 5.38330045e-08]
+#  [4.80189700e-22 2.24694815e-06 9.99997753e-01 4.95562296e-24]
+#  [2.29322398e-06 2.35268380e-02 2.29155759e-03 9.74179311e-01]]
+# 混淆矩阵：其中横向表示predict，纵向表示真实标签
+#  [[135   7   0   0]
+#  [  5 134   1   4]
+#  [  0   0 151   3]
+#  [  0   4   1 155]]
